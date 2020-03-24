@@ -1,13 +1,21 @@
+import java.nio.file.FileSystemException;
+
 public class File {
     String FileName;
     Allocation Allocation;
-    long SizeOnDisk;
-    long Size;
-    File(String FileName,long Size,Allocation Allocation){
+    long sizeOnDisk;
+    long size;
+    Directory parent;
+    File(String FileName,long Size,Allocation Allocation,Directory parent){
         this.FileName = FileName;
-        this.Size = Size;
+        this.size = Size;
         this.Allocation = Allocation;
-        this.SizeOnDisk = Allocation.getAllocationSize();
+        this.sizeOnDisk = Allocation.getAllocationSize();
+        this.parent = parent;
+    }
+    void delete() {
+        Allocation.release();
+        parent.removeFromList(this);
     }
 
 }

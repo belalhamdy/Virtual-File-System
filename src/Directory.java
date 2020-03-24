@@ -1,43 +1,57 @@
-import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Directory {
     String DirectoryName;
-    final List<File> SubFiles = new ArrayList<>();
-    final List<Directory> SubDirectories = new ArrayList<>();
-    long SizeOnDisk = 0, Size = 0;
+    Directory parent;
+    final List<File> subFiles = new ArrayList<>();
+    final List<Directory> subDirectories = new ArrayList<>();
+    long sizeOnDisk = 0, size = 0;
 
-    Directory(String DirectoryName) {
+    Directory(String DirectoryName, Directory parent) {
         this.DirectoryName = DirectoryName;
     }
 
     void add(File file) {
-        SubFiles.add(file);
-        SizeOnDisk += file.SizeOnDisk;
-        Size += file.Size;
+        subFiles.add(file);
+        sizeOnDisk += file.sizeOnDisk;
+        size += file.size;
     }
 
     void add(Directory dir) {
-        SubDirectories.add(dir);
-        SizeOnDisk += dir.SizeOnDisk;
-        Size += dir.Size;
+        subDirectories.add(dir);
+        sizeOnDisk += dir.sizeOnDisk;
+        size += dir.size;
     }
 
-    void remove(File file) throws FileSystemException {
-        if (SubFiles.remove(file)) {
-            SizeOnDisk -= file.SizeOnDisk;
-            Size -= file.Size;
-        }
-        else throw new FileSystemException("File does not exist in directory");
+    void changeSize(long differenceOnDisk, long differenceOnSize) {
+        sizeOnDisk -= differenceOnDisk;
+        size -= differenceOnSize;
+        if (parent != null)
+            parent.changeSize(differenceOnDisk, differenceOnSize);
+
     }
 
-    void remove(Directory dir) throws FileSystemException {
-        if (SubDirectories.remove(dir)) {
-            SizeOnDisk -= dir.SizeOnDisk;
-            Size -= dir.Size;
+    void delete() throws FileSystemException {
+        for (File file : subFiles) {
+            file.delete();
         }
-        else throw new FileSystemException("Directory does not exist in directory");
+        for (Directory dir : subDirectories) {
+            dir.delete();
+        }
+        parent.removeFromList(this);
     }
+
+    void removeFromList(File file) {
+        subFiles.remove(file);
+        changeSize(file.sizeOnDisk, file.size);
+    }
+
+    void removeFromList(Directory dir) {
+        subDirectories.remove(dir);
+        changeSize(dir.sizeOnDisk, dir.size);
+    }
+
+
 }
