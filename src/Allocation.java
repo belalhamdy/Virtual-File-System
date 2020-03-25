@@ -3,8 +3,8 @@ import java.util.List;
 public class Allocation {
     List<Integer> Blocks;
     long AllocationSize;
-    Disk disk;
-    Allocation(List<Integer> Blocks, long BlockSize,Disk disk) {
+    IDisk disk;
+    Allocation(List<Integer> Blocks, long BlockSize, IDisk disk) {
         this.Blocks = Blocks;
         this.AllocationSize = this.Blocks.size() * BlockSize;
         this.disk = disk;
