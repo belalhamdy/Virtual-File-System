@@ -1,16 +1,16 @@
-import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Directory {
-    String DirectoryName;
-    Directory parent;
-    final List<File> subFiles = new ArrayList<>();
-    final List<Directory> subDirectories = new ArrayList<>();
-    long sizeOnDisk = 0, size = 0;
+    private String directoryName;
+    private Directory parent;
+    private final List<File> subFiles = new ArrayList<>();
+    private final List<Directory> subDirectories = new ArrayList<>();
+    private long sizeOnDisk = 0, size = 0;
 
     Directory(String DirectoryName, Directory parent) {
-        this.DirectoryName = DirectoryName;
+        this.parent = parent;
+        this.directoryName = DirectoryName;
     }
 
     void add(File file) {
@@ -25,7 +25,7 @@ public class Directory {
         size += dir.size;
     }
 
-    void changeSize(long differenceOnDisk, long differenceOnSize) {
+    private void changeSize(long differenceOnDisk, long differenceOnSize) {
         sizeOnDisk -= differenceOnDisk;
         size -= differenceOnSize;
         if (parent != null)
@@ -33,14 +33,15 @@ public class Directory {
 
     }
 
-    void delete() throws FileSystemException {
+    void delete() {
         for (File file : subFiles) {
             file.delete();
         }
         for (Directory dir : subDirectories) {
             dir.delete();
         }
-        parent.removeFromList(this);
+        if (parent != null)
+            parent.removeFromList(this);
     }
 
     void removeFromList(File file) {
@@ -54,4 +55,18 @@ public class Directory {
     }
 
 
+    public Directory getSubDirectoryByName(String name) {
+        return subDirectories
+                .stream()
+                .filter(dir -> dir.directoryName.toLowerCase().equals(name.toLowerCase()))
+                .findAny()
+                .orElse(null);
+    }
+    public File getSubFileByName(String name){
+        return subFiles
+                .stream()
+                .filter(file -> file.fileName.toLowerCase().equals(name.toLowerCase()))
+                .findAny()
+                .orElse(null);
+    }
 }

@@ -1,27 +1,36 @@
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class IDisk {
-    String diskName;
-    long diskSize, blockSize;
-    int diskSizeInBlocks, nEmptyBlocks;
+    private String diskName;
+    final private long diskSize, blockSize;
+    private long nEmptyBlocks;
     private boolean[] diskSpace; // array that will carry disk data use in your class anyway to fill this array, DONT FILL THIS ARRAY
 
-    IDisk(String diskName, long diskSize, long blockSize) {
+    final int diskSizeInBlocks;
+
+    IDisk(String diskName, int diskSizeInBlocks, long blockSize) {
         this.diskName = diskName;
-        this.diskSize = diskSize;
+        this.diskSize = diskSizeInBlocks * blockSize;
         this.blockSize = blockSize;
 
-        this.diskSizeInBlocks = (int) Math.ceil(1.0 * diskSize / blockSize);
+        this.diskSizeInBlocks = diskSizeInBlocks;
         this.nEmptyBlocks = diskSizeInBlocks;
         this.diskSpace = new boolean[diskSizeInBlocks];
     }
 
-    void fillDiskSpace(int index) {
+    boolean isBlockFree(int index){
+        return diskSpace[index];
+    }
+    private void fillDiskSpace(int index) {
         --nEmptyBlocks;
         diskSpace[index] = true;
     }
 
-    void releaseDiskSpace(int index) {
+    private void releaseDiskSpace(int index) {
         ++nEmptyBlocks;
         diskSpace[index] = false;
     }
@@ -43,16 +52,16 @@ public abstract class IDisk {
     }
 
     Allocation allocate(long size) {
-        int sizeInBlocks = (int) Math.ceil(1.0 * diskSize / blockSize);
+        long sizeInBlocks = (size + blockSize - 1) / blockSize;
         List<Integer> indices = allocateUsingAlgorithm(sizeInBlocks);
 
-        if(indices != null)
+        if (indices != null)
             for (Integer blockIdx : indices) fillDiskSpace(blockIdx);
 
-        return new Allocation(indices,blockSize, this);
+        return new Allocation(indices, blockSize, this);
     }
 
-    void release(Allocation allocation){
+    void release(Allocation allocation) {
         List<Integer> indices = allocation.Blocks;
         for (Integer blockIdx : indices)
             releaseDiskSpace(blockIdx);
@@ -60,6 +69,7 @@ public abstract class IDisk {
         releaseUsingAlgorithm(indices);
     }
 
-    abstract List<Integer> allocateUsingAlgorithm(int sizeInBlocks);
+    abstract List<Integer> allocateUsingAlgorithm(long sizeInBlocks);
+
     abstract void releaseUsingAlgorithm(List<Integer> indices);
 }
