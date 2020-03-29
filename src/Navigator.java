@@ -13,7 +13,8 @@ public class Navigator {
     Pair<Directory, String> seperateLastEntry(String path) {
         Path p = Paths.get(path);
         Directory cur = root;
-        for (int i = 0; i < p.getNameCount() - 1; i++) {
+        if (!p.getName(0).toString().equals("root")) return null;
+        for (int i = 1; i < p.getNameCount() - 1; i++) {
             cur = cur.getSubDirectoryByName(p.getName(i).toString());
             if (cur == null) break;
         }

@@ -22,4 +22,8 @@ public class FileSystem {
     void deleteDirectory(Directory dir) {
         dir.delete();
     }
+
+    IDisk getDisk() {
+        return disk;
+    }
 }
