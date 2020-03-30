@@ -16,4 +16,11 @@ public class File {
         parent.removeFromList(this);
     }
 
+    public String getName() {
+        return fileName;
+    }
+    @Override
+    public String toString(){
+        return fileName + " " + size + "KB " + allocation.toString();
+    }
 }

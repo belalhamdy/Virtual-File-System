@@ -1,12 +1,12 @@
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class IDisk {
     private String diskName;
-    final private long diskSize, blockSize;
+    final private long diskSize;
+    final private long blockSize;
     private long nEmptyBlocks;
     private boolean[] diskSpace; // array that will carry disk data use in your class anyway to fill this array, DONT FILL THIS ARRAY
 
@@ -62,14 +62,40 @@ public abstract class IDisk {
     }
 
     void release(Allocation allocation) {
-        List<Integer> indices = allocation.Blocks;
+        List<Integer> indices = allocation.getIndividualBlocks();
         for (Integer blockIdx : indices)
             releaseDiskSpace(blockIdx);
 
         releaseUsingAlgorithm(indices);
     }
 
+    public Allocation fromString(String s, long blockSize) {
+        List<Integer> lst = new ArrayList<>();
+
+        Pattern pat = Pattern.compile("([0-9]+) *- *([0-9]+)");
+        for (String sub : s.split(" *, *")) {
+            Matcher match = pat.matcher(sub);
+            if (match.matches()) {
+                int start = Integer.parseInt(match.group(1));
+                int end = Integer.parseInt(match.group(2));
+                for (int i = start; i <= end; i++) {
+                    lst.add(i);
+                    fillDiskSpace(i);
+                }
+            } else {
+                int idx = Integer.parseInt(sub);
+                lst.add(idx);
+                fillDiskSpace(idx);
+            }
+        }
+        return new Allocation(lst, blockSize, this);
+    }
+
     abstract List<Integer> allocateUsingAlgorithm(long sizeInBlocks);
 
     abstract void releaseUsingAlgorithm(List<Integer> indices);
+
+    public long getBlockSize() {
+        return blockSize;
+    }
 }

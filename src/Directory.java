@@ -54,6 +54,22 @@ public class Directory {
         changeSize(dir.sizeOnDisk, dir.size);
     }
 
+    public int getSubDirectoriesCount() {
+        return subDirectories.size();
+    }
+
+    public int getSubFilesCount() {
+        return subFiles.size();
+    }
+
+    public Directory getSubDirectoryByIndex(int index) {
+        return subDirectories.get(index);
+    }
+
+    public File getSubFileByIndex(int index) {
+        return subFiles.get(index);
+    }
+
 
     public Directory getSubDirectoryByName(String name) {
         return subDirectories
@@ -62,11 +78,24 @@ public class Directory {
                 .findAny()
                 .orElse(null);
     }
-    public File getSubFileByName(String name){
+
+    public File getSubFileByName(String name) {
         return subFiles
                 .stream()
                 .filter(file -> file.fileName.toLowerCase().equals(name.toLowerCase()))
                 .findAny()
                 .orElse(null);
+    }
+
+    public String getName() {
+        return directoryName;
+    }
+    @Override
+    public String toString(){
+        return directoryName;
+    }
+
+    public Directory getParent() {
+        return parent;
     }
 }

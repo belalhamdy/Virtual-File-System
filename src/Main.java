@@ -4,62 +4,82 @@ import java.util.Scanner;
 
 public class Main {
     static Scanner in = new Scanner(System.in);
-    static FileSystem fs = new FileSystem(new ContiguousAllocationDisk("My disk", 1024, 1));
+    static IDisk disk = new ContiguousAllocationDisk("My disk", 1024, 1);
     static Navigator ng = new Navigator();
 
-    /*
-        CreateFile root/file.txt 100
-        CreateFolder root/folder1
-        DeleteFile root/folder1/file.txt
-        DeleteFolder root/folder1
-        DisplayDiskStatus                   //(Empty space, allocated space, empty blocks, allocated blocks)
-        DisplayDiskStructure	            //tree structure of disk
-        Exit
-    */
+    enum Command {
+        CreateFile(2),
+        CreateFolder(1),
+        DeleteFile(1),
+        DeleteFolder(1),
+        DisplayDiskStatus(0),
+        DisplayDiskStructure(0),
+        Exit(0);
+
+        private int argCnt;
+
+        Command(int argCnt) {
+            this.argCnt = argCnt;
+        }
+
+        public int getArgCnt() {
+            return argCnt;
+        }
+    }
+
     public static void main(String[] args) {
+        try {
+            FileSystem.loadVFS("D:/test.vfs", ng.getRoot(), disk);
+            FileSystem.saveVFS("D:/test2.vfs", ng.getRoot());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        //System.out.println(Allocation.fromString(test, 1024, fs.getDisk()).toString());
         while (true) {
             System.out.print("cmd: ");
             String input = in.nextLine();
             String[] ret = input.split(" ");
 
-            String cmd = ret[0];
+            if (!argumentVerification(ret)) continue;
 
-            argumentVerification(ret, cmd);
+            Command cmd = Command.valueOf(ret[0]);
+
             Pair<Directory, String> p;
             Directory d;
             File f;
 
             switch (cmd) {
-                case "CreateFile":
+                case CreateFile:
                     int sz = Integer.parseInt(ret[2]);
                     p = ng.seperateLastEntry(ret[1]);
-                    fs.createFile(p.getKey(), p.getValue(), sz);
+                    FileSystem.createFile(p.getKey(), p.getValue(), sz, disk);
 
                     break;
-                case "CreateFolder":
+                case CreateFolder:
                     p = ng.seperateLastEntry(ret[1]);
-                    fs.createDirectory(p.getKey(), p.getValue());
+                    FileSystem.createDirectory(p.getKey(), p.getValue());
                     break;
 
-                case "DeleteFile":
+                case DeleteFile:
                     f = ng.navigateToFile(ret[1]);
-                    fs.deleteFile(f);
+                    FileSystem.deleteFile(f);
 
                     break;
-                case "DeleteFolder":
+                case DeleteFolder:
                     d = ng.navigateToDirectory(ret[1]);
-                    fs.deleteDirectory(d);
+                    FileSystem.deleteDirectory(d);
 
                     break;
-                case "DisplayDiskStatus":
-                    System.out.println("Allocated Blocks: " + fs.getDisk().getAllocatedBlocks());
-                    System.out.println("Allocated Spaces: " + fs.getDisk().getAllocatedSpace());
-                    System.out.println("Free Blocks: " + fs.getDisk().getEmptyBlocks());
-                    System.out.println("Free Spaces: " + fs.getDisk().getEmptySpace());
+                case DisplayDiskStatus:
+                    System.out.println("Allocated Blocks: " + disk.getAllocatedBlocks());
+                    System.out.println("Allocated Spaces: " + disk.getAllocatedSpace());
+                    System.out.println("Free Blocks: " + disk.getEmptyBlocks());
+                    System.out.println("Free Spaces: " + disk.getEmptySpace());
                     break;
-                case "DisplayDiskStructure":
+                case DisplayDiskStructure:
+                    ng.printVirtualFileSystem(System.out);
                     break;
-                case "Exit":
+                case Exit:
                     return;
                 default:
                     System.out.println("bad input");
@@ -68,35 +88,26 @@ public class Main {
         }
     }
 
-    private static void argumentVerification(String[] ret, String cmd) {
-        switch (cmd) {
-            case "CreateFile":
-                if (ret.length != 3) {
-                    System.out.println(cmd + " takes 2 parameters.");
-                    break;
-                }
+    private static boolean argumentVerification(String[] ret) {
+        String cmd = ret[0];
+        try {
+            Command v = Command.valueOf(cmd);
+            if (ret.length != v.argCnt + 1) {
+                System.out.println(cmd + " takes 2 parameters.");
+                return false;
+            }
+            if (ret.length == 3) {
                 try {
                     Integer.parseInt(ret[2]);
                 } catch (Exception ignored) {
                     System.out.println("size is not integer");
+                    return false;
                 }
-                break;
-            case "CreateFolder":
-            case "DeleteFile":
-            case "DeleteFolder":
-                if (ret.length != 2) {
-                    System.out.println(cmd + " takes one parameter.");
-                    break;
-                }
-                break;
-            case "DisplayDiskStatus":
-            case "DisplayDiskStructure":
-            case "Exit":
-                if (ret.length != 1) {
-                    System.out.println(cmd + " takes no parameters.");
-                    break;
-                }
-                break;
+            }
+            return true;
+        } catch (Exception ignored) {
+            System.out.println("Invalid command");
+            return false;
         }
     }
 }
