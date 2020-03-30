@@ -33,7 +33,8 @@ public class ContiguousAllocationDisk extends IDisk {
     }
 
     @Override
-    List<Integer> allocateUsingAlgorithm(long sizeInBlocks) {
+    List<Integer> allocateUsingAlgorithm(long sizeInBlocks) throws OutOfMemoryError{
+
         if (sizeInBlocks <= 0) return null;
 
         int minSizeIdx = getBestFitIndex(sizeInBlocks);
@@ -45,6 +46,8 @@ public class ContiguousAllocationDisk extends IDisk {
                 indices.add(i);
             }
             updateArrayAfterAllocate(minSizeIdx, indices.size());
+        }else{
+            throw new OutOfMemoryError("Cannot allocate blocks for this file.");
         }
         return indices;
     }

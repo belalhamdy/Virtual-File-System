@@ -8,7 +8,7 @@ public class IndexedAllocationDisk extends IDisk {
     }
 
     @Override
-    List<Integer> allocateUsingAlgorithm(long sizeInBlocks) {
+    List<Integer> allocateUsingAlgorithm(long sizeInBlocks) throws OutOfMemoryError {
         if (sizeInBlocks < getEmptyBlocks()) return null;
 
         List<Integer> ret = new ArrayList<>();
@@ -18,6 +18,7 @@ public class IndexedAllocationDisk extends IDisk {
                 --sizeInBlocks;
             }
         }
+        if (sizeInBlocks > 0) throw new OutOfMemoryError("Cannot allocate blocks for this file.");
         return ret;
     }
 

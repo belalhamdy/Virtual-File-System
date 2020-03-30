@@ -10,25 +10,29 @@ public class Navigator {
         this.root = new Directory("root", null);
     }
 
-    Pair<Directory, String> seperateLastEntry(String path) {
+    Pair<Directory, String> seperateLastEntry(String path) throws FileNotFoundException {
         Path p = Paths.get(path);
         Directory cur = root;
         if (!p.getName(0).toString().equals("root")) return null;
         for (int i = 1; i < p.getNameCount() - 1; i++) {
             cur = cur.getSubDirectoryByName(p.getName(i).toString());
-            if (cur == null) break;
+            if (cur == null) throw new FileNotFoundException(p.getName(i).toString() + " directory does not exit");
         }
         return new Pair<>(cur, p.getFileName().toString());
     }
 
-    Directory navigateToDirectory(String path) {
+    Directory navigateToDirectory(String path) throws FileNotFoundException {
         Pair<Directory, String> ret = seperateLastEntry(path);
-        return ret.getKey().getSubDirectoryByName(ret.getValue());
+        Directory dir = ret.getKey().getSubDirectoryByName(ret.getValue());
+        if (dir == null) throw new FileNotFoundException(ret.getValue() + " directory does not exit");
+        return dir;
     }
 
-    File navigateToFile(String path) {
+    File navigateToFile(String path) throws FileNotFoundException {
         Pair<Directory, String> ret = seperateLastEntry(path);
-        return ret.getKey().getSubFileByName(ret.getValue());
+        File file = ret.getKey().getSubFileByName(ret.getValue());
+        if (file == null) throw new FileNotFoundException(ret.getValue() + " file does not exit");
+        return file;
     }
 
     public Directory getRoot() {

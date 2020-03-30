@@ -29,12 +29,12 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            FileSystem.loadVFS("D:/test.vfs", ng.getRoot(), disk);
-            FileSystem.saveVFS("D:/test2.vfs", ng.getRoot());
+            FileSystem.loadVFS("data.vfs", ng.getRoot(), disk);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println("Couldn't locate Virtual File System data, a new VFS will be created.");
         }
-        //System.out.println(Allocation.fromString(test, 1024, fs.getDisk()).toString());
+
+        input_loop:
         while (true) {
             System.out.print("cmd: ");
             String input = in.nextLine();
@@ -51,24 +51,38 @@ public class Main {
             switch (cmd) {
                 case CreateFile:
                     int sz = Integer.parseInt(ret[2]);
-                    p = ng.seperateLastEntry(ret[1]);
-                    FileSystem.createFile(p.getKey(), p.getValue(), sz, disk);
+                    try {
+                        p = ng.seperateLastEntry(ret[1]);
+                        FileSystem.createFile(p.getKey(), p.getValue(), sz, disk);
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
 
                     break;
                 case CreateFolder:
-                    p = ng.seperateLastEntry(ret[1]);
-                    FileSystem.createDirectory(p.getKey(), p.getValue());
+                    try {
+                        p = ng.seperateLastEntry(ret[1]);
+                        FileSystem.createDirectory(p.getKey(), p.getValue());
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
                     break;
 
                 case DeleteFile:
-                    f = ng.navigateToFile(ret[1]);
-                    FileSystem.deleteFile(f);
-
+                    try {
+                        f = ng.navigateToFile(ret[1]);
+                        FileSystem.deleteFile(f);
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
                     break;
                 case DeleteFolder:
-                    d = ng.navigateToDirectory(ret[1]);
-                    FileSystem.deleteDirectory(d);
-
+                    try {
+                        d = ng.navigateToDirectory(ret[1]);
+                        FileSystem.deleteDirectory(d);
+                    }catch(Exception ex){
+                        System.out.println(ex.getMessage());
+                    }
                     break;
                 case DisplayDiskStatus:
                     System.out.println("Allocated Blocks: " + disk.getAllocatedBlocks());
@@ -80,11 +94,16 @@ public class Main {
                     ng.printVirtualFileSystem(System.out);
                     break;
                 case Exit:
-                    return;
+                    break input_loop;
                 default:
                     System.out.println("bad input");
                     break;
             }
+        }
+        try {
+            FileSystem.saveVFS("data.vfs", ng.getRoot());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -110,4 +129,5 @@ public class Main {
             return false;
         }
     }
+
 }

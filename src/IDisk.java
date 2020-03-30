@@ -91,7 +91,7 @@ public abstract class IDisk {
         return new Allocation(lst, blockSize, this);
     }
 
-    abstract List<Integer> allocateUsingAlgorithm(long sizeInBlocks);
+    abstract List<Integer> allocateUsingAlgorithm(long sizeInBlocks) throws OutOfMemoryError;
 
     abstract void releaseUsingAlgorithm(List<Integer> indices);
 
