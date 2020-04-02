@@ -12,7 +12,7 @@ public class Directory {
         this.directoryName = directoryName;
     }
     Directory(String directoryName, Directory parent) throws Exception {
-        if (FileSystem.NameIsNotValid(directoryName)) throw new Exception("Invalid Directory Name");
+        if (FileSystem.NameIsNotValid(directoryName,true)) throw new Exception("Invalid Directory Name");
 
         this.parent = parent;
         this.directoryName = directoryName;

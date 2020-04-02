@@ -1,6 +1,10 @@
 [root]
 [testing]
-tooot.txt#3#3-5
 [#testing]
-test.txt#6#0-2, 6-8
+[test1]
+file1.txt#100#0-99
+[#test1]
+[test2]
+file2.txt#50#100-149
+[#test2]
 [#root]

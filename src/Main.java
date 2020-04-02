@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class Main {
     static Scanner in = new Scanner(System.in);
-    static IDisk disk = new IndexedAllocationDisk("My disk", 10, 1);
+    static IDisk disk = new IndexedAllocationDisk("My disk", 1024, 1);
     static Navigator ng = new Navigator();
     static String fileName = "data.vfs";
     enum Command {

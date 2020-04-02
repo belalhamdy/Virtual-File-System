@@ -6,7 +6,7 @@ public class FileSystem {
     private FileSystem() {
 
     }
-    public static boolean NameIsNotValid(String name){
+    public static boolean NameIsNotValid(String name, boolean isDirectory){
         final char[] notValid = {'[' , ']','#','/','\\'};
         if (name == null || name.length() == 0) {
             return false;
@@ -19,6 +19,7 @@ public class FileSystem {
                 }
             }
         }
+        if(isDirectory) return name.contains(".");
         return false;
 
     }
