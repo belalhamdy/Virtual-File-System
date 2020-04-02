@@ -1,5 +1,6 @@
 [root]
 [testing]
-tooot.txt#100#924-1023
+tooot.txt#3#3-5
 [#testing]
+test.txt#6#0-2, 6-8
 [#root]

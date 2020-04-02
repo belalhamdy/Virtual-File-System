@@ -4,9 +4,9 @@ import java.util.Scanner;
 
 public class Main {
     static Scanner in = new Scanner(System.in);
-    static IDisk disk = new ContiguousAllocationDisk("My disk", 1024, 1);
+    static IDisk disk = new IndexedAllocationDisk("My disk", 10, 1);
     static Navigator ng = new Navigator();
-
+    static String fileName = "data.vfs";
     enum Command {
         CreateFile(2),
         CreateFolder(1),
@@ -29,7 +29,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            FileSystem.loadVFS("data.vfs", ng.getRoot(), disk);
+            FileSystem.loadVFS(fileName, ng.getRoot(), disk);
         } catch (Exception ex) {
             System.out.println("Couldn't locate Virtual File System data, a new VFS will be created.");
         }
@@ -101,7 +101,7 @@ public class Main {
             }
         }
         try {
-            FileSystem.saveVFS("data.vfs", ng.getRoot());
+            FileSystem.saveVFS(fileName, ng.getRoot());
         } catch (Exception e) {
             e.printStackTrace();
         }
