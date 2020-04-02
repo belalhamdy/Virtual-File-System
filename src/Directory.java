@@ -18,13 +18,20 @@ public class Directory {
         this.directoryName = directoryName;
     }
 
-    void add(File file) {
+    void add(File file) throws Exception {
+        for(File f: subFiles){
+            if(f.fileName.equals(file.fileName)) throw new Exception("Error There is another a file with the same name in " + directoryName + ".");
+        }
         subFiles.add(file);
         sizeOnDisk += file.sizeOnDisk;
         size += file.size;
     }
 
-    void add(Directory dir) {
+    void add(Directory dir) throws Exception {
+        for(Directory d: subDirectories){
+            if(d.directoryName.equals(dir.directoryName)) throw new Exception("Error There is another a folder with the same name in " + directoryName + ".");
+        }
+
         subDirectories.add(dir);
         sizeOnDisk += dir.sizeOnDisk;
         size += dir.size;

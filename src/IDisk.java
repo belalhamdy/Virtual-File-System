@@ -23,7 +23,7 @@ public abstract class IDisk {
     }
 
     boolean isBlockFree(int index){
-        return diskSpace[index];
+        return !diskSpace[index];
     }
     private void fillDiskSpace(int index) {
         --nEmptyBlocks;

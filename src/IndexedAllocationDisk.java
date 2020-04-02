@@ -9,7 +9,7 @@ public class IndexedAllocationDisk extends IDisk {
 
     @Override
     List<Integer> allocateUsingAlgorithm(long sizeInBlocks) throws OutOfMemoryError {
-        if (sizeInBlocks < getEmptyBlocks()) return null;
+        if (sizeInBlocks > getEmptyBlocks()) return null;
 
         List<Integer> ret = new ArrayList<>();
         for (int i = 0; sizeInBlocks > 0 && i < diskSizeInBlocks; i++) {
