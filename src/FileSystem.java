@@ -73,6 +73,19 @@ public class FileSystem {
         fstream.close();
 
     }
+     public static void saveAdditionalData(String filePath, IDisk disk) throws Exception {
+        FileOutputStream fstream = new FileOutputStream(filePath);
+        StringBuilder out = new StringBuilder("Free Blocks: " + disk.getEmptyBlocks() + "\nAllocated Blocks: " + disk.getAllocatedBlocks() + "\nAllocated Blocks: ");
+         for (boolean item : disk.getDiskSpace())
+         {
+             if (item) out.append('1');
+             else out.append('0');
+         }
+         fstream.write(out.toString().getBytes());
+
+        fstream.close();
+
+    }
 
     public static void loadVFS(String filePath, Directory root, IDisk dsk) throws Exception {
 

@@ -46,7 +46,9 @@ public abstract class IDisk {
     long getEmptyBlocks() {
         return nEmptyBlocks;
     }
-
+    boolean[] getDiskSpace(){
+        return diskSpace;
+    }
     long getAllocatedBlocks() {
         return (diskSizeInBlocks - nEmptyBlocks);
     }

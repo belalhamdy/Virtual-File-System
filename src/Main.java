@@ -6,7 +6,8 @@ public class Main {
     static Scanner in = new Scanner(System.in);
     static IDisk disk = new IndexedAllocationDisk("My disk", 1024, 1);
     static Navigator ng = new Navigator();
-    static String fileName = "data.vfs";
+    static String structureFileName = "data.vfs";
+    static String additionalDataFileName = "dataInformation.txt";
     enum Command {
         CreateFile(2),
         CreateFolder(1),
@@ -29,7 +30,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            FileSystem.loadVFS(fileName, ng.getRoot(), disk);
+            FileSystem.loadVFS(structureFileName, ng.getRoot(), disk);
         } catch (Exception ex) {
             System.out.println("Couldn't locate Virtual File System data, a new VFS will be created.");
         }
@@ -101,7 +102,8 @@ public class Main {
             }
         }
         try {
-            FileSystem.saveVFS(fileName, ng.getRoot());
+            FileSystem.saveVFS(structureFileName, ng.getRoot());
+            FileSystem.saveAdditionalData(additionalDataFileName,disk);
         } catch (Exception e) {
             e.printStackTrace();
         }
