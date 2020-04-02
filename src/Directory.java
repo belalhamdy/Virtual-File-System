@@ -8,8 +8,11 @@ public class Directory {
     private final List<Directory> subDirectories = new ArrayList<>();
     private long sizeOnDisk = 0, size = 0;
 
+    Directory (String directoryName){
+        this.directoryName = directoryName;
+    }
     Directory(String directoryName, Directory parent) throws Exception {
-        if (!FileSystem.validateName(directoryName)) throw new Exception("Invalid Directory Name");
+        if (FileSystem.NameIsNotValid(directoryName)) throw new Exception("Invalid Directory Name");
 
         this.parent = parent;
         this.directoryName = directoryName;

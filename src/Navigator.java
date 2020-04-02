@@ -7,7 +7,7 @@ public class Navigator {
     final private Directory root;
 
     Navigator() {
-        this.root = new Directory("root", null);
+        this.root = new Directory("root");
     }
 
     Pair<Directory, String> seperateLastEntry(String path) throws FileNotFoundException {
