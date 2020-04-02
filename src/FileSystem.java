@@ -1,3 +1,5 @@
+import com.sun.xml.internal.ws.util.StringUtils;
+
 import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -6,7 +8,22 @@ public class FileSystem {
     private FileSystem() {
 
     }
+    public static boolean validateName(String name){
+        final char[] notValid = {'[' , ']','#','/','\\'};
+        if (name == null || name.length() == 0) {
+            return true;
+        }
+        for (int i = 0; i < name.length(); i++) {
+            char ch = name.charAt(i);
+            for (char c : notValid) {
+                if (c == ch) {
+                    return false;
+                }
+            }
+        }
+        return true;
 
+    }
     public static void createFile(Directory parent, String name, long size, IDisk disk) {
         File f = new File(name, size, disk.allocate(size), parent);
         parent.add(f);

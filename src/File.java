@@ -4,11 +4,13 @@ public class File {
     long sizeOnDisk;
     long size;
     Directory parent;
-    File(String FileName,long Size,Allocation Allocation,Directory parent){
-        this.fileName = FileName;
-        this.size = Size;
-        this.allocation = Allocation;
-        this.sizeOnDisk = Allocation.getAllocationSize();
+    File(String fileName,long size,Allocation allocation,Directory parent) throws Exception {
+        if (!FileSystem.validateName(fileName)) throw new Exception("Invalid File Name");
+
+        this.fileName = fileName;
+        this.size = size;
+        this.allocation = allocation;
+        this.sizeOnDisk = allocation.getAllocationSize();
         this.parent = parent;
     }
     void delete() {
