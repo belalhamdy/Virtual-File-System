@@ -6,7 +6,7 @@ public class User {
     private final static String adminName = "Admin";
     private final static String adminPassword = "1234";
 
-    public static User anonymous = new User("", "","00"); // Anonymous cannot create or delete
+    public static User anonymous = new User("", "", "00"); // Anonymous cannot create or delete
     private static User currentUser = anonymous;
     private static List<User> users = new ArrayList<User>() {
         {
@@ -38,7 +38,7 @@ public class User {
         if (type.length() > 2 || !type.matches("[0-1]+"))
             throw new Exception("Invalid type please enter 00 or 01 or 10 or 11 only. ");
 
-        users.add(new User(name, password,type));
+        users.add(new User(name, password, type));
     }
 
     public static void deleteUser(String name) throws Exception {
@@ -62,13 +62,15 @@ public class User {
         throw new Exception("Invalid username or password");
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
-    public boolean canCreate(){
+
+    public boolean canCreate() {
         return this.type.charAt(0) == '1';
     }
-    public boolean canDelete(){
+
+    public boolean canDelete() {
         return this.type.charAt(1) == '1';
     }
 
