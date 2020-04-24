@@ -50,7 +50,7 @@ public class User {
                 return;
             }
 
-        throw new Exception("Cannot delete user.. user doesn't exists.");
+        throw new Exception("Cannot delete user.. user doesn't exist.");
     }
 
     public static void login(String name, String password) throws Exception {
