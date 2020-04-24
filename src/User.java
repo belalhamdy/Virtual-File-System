@@ -6,8 +6,7 @@ public class User {
     private final static String adminName = "Admin";
     private final static String adminPassword = "1234";
 
-    public static User anonymous = new User("", "", "00"); // Anonymous cannot create or delete
-    private static User currentUser = anonymous;
+    private static User currentUser = null;
     private static List<User> users = new ArrayList<User>() {
         {
             add(new User(adminName, adminPassword, "11"));
