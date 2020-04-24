@@ -8,6 +8,7 @@ public class Main {
     static Navigator ng = new Navigator();
     static String structureFileName = "data.vfs";
     static String additionalDataFileName = "dataInformation.txt";
+
     enum Command {
         CreateFile(2),
         CreateFolder(1),
@@ -81,7 +82,7 @@ public class Main {
                     try {
                         d = ng.navigateToDirectory(ret[1]);
                         FileSystem.deleteDirectory(d);
-                    }catch(Exception ex){
+                    } catch (Exception ex) {
                         System.out.println(ex.getMessage());
                     }
                     break;
@@ -103,7 +104,7 @@ public class Main {
         }
         try {
             FileSystem.saveVFS(structureFileName, ng.getRoot());
-            FileSystem.saveAdditionalData(additionalDataFileName,disk);
+            FileSystem.saveAdditionalData(additionalDataFileName, disk);
         } catch (Exception e) {
             e.printStackTrace();
         }
