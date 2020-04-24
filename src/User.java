@@ -7,7 +7,7 @@ public class User {
     private final static String adminPassword = "1234";
 
     private static User admin = new User(adminName, adminPassword, "11");
-    private static User currentUser = admin; // It is said that the default user will be the admin
+    private static User currentUser = admin; // It is said that the default user will be the admin, don't save the admin in user files save only "users" List
     private static List<User> users = new ArrayList<>();
 
     private String name, password, type; // 00 - 10 - 01 - 11
