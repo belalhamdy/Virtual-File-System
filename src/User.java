@@ -35,7 +35,7 @@ public class User {
             if (user.name.equals(name))
                 throw new Exception("Cannot create user.. a user with same name already exists.");
 
-        if (type.length() > 2 || !type.matches("[0-1]+"))
+        if (!type.matches("[0-1][0-1]"))
             throw new Exception("Invalid type please enter 00 or 01 or 10 or 11 only. ");
 
         users.add(new User(name, password, type));
