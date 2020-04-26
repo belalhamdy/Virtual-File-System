@@ -8,19 +8,36 @@ public class Directory {
     private final List<Directory> subDirectories = new ArrayList<>();
     private long sizeOnDisk = 0, size = 0;
 
-    Directory (String directoryName){
+    List<Permission> permissions = new ArrayList<>();
+
+    Directory(String directoryName) {
         this.directoryName = directoryName;
     }
+
     Directory(String directoryName, Directory parent) throws Exception {
-        if (FileSystem.NameIsNotValid(directoryName,true)) throw new Exception("Invalid Directory Name");
+        if (FileSystem.NameIsNotValid(directoryName, true)) throw new Exception("Invalid Directory Name");
 
         this.parent = parent;
         this.directoryName = directoryName;
     }
 
+    // return if there any previous permissions
+    boolean grant(Permission permission) {
+        boolean ret = permissions.removeIf((p) -> p.username.equals(permission.username));
+        permissions.add(permission);
+
+        return ret;
+    }
+    boolean canCreate(String username){
+        return permissions.stream().anyMatch(permission -> permission.username.equals(username) && permission.canCreate());
+    }
+    boolean canDelete(String username){
+        return permissions.stream().anyMatch(permission -> permission.username.equals(username) && permission.canDelete());
+    }
     void add(File file) throws Exception {
-        for(File f: subFiles){
-            if(f.fileName.equals(file.fileName)) throw new Exception("Error There is another a file with the same name in " + directoryName + ".");
+        for (File f : subFiles) {
+            if (f.fileName.equals(file.fileName))
+                throw new Exception("Error There is another a file with the same name in " + directoryName + ".");
         }
         subFiles.add(file);
         sizeOnDisk += file.sizeOnDisk;
@@ -28,8 +45,9 @@ public class Directory {
     }
 
     void add(Directory dir) throws Exception {
-        for(Directory d: subDirectories){
-            if(d.directoryName.equals(dir.directoryName)) throw new Exception("Error There is another a folder with the same name in " + directoryName + ".");
+        for (Directory d : subDirectories) {
+            if (d.directoryName.equals(dir.directoryName))
+                throw new Exception("Error There is another a folder with the same name in " + directoryName + ".");
         }
 
         subDirectories.add(dir);
@@ -102,8 +120,9 @@ public class Directory {
     public String getName() {
         return directoryName;
     }
+
     @Override
-    public String toString(){
+    public String toString() {
         return directoryName;
     }
 

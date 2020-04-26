@@ -10,7 +10,8 @@ public class Navigator {
         this.root = new Directory("root");
     }
 
-    Pair<Directory, String> seperateLastEntry(String path) throws FileNotFoundException {
+    Pair<Directory, String> separateLastEntry(String path) throws Exception {
+
         Path p = Paths.get(path);
         Directory cur = root;
         if (!p.getName(0).toString().equals("root")) return null;
@@ -21,15 +22,15 @@ public class Navigator {
         return new Pair<>(cur, p.getFileName().toString());
     }
 
-    Directory navigateToDirectory(String path) throws FileNotFoundException {
-        Pair<Directory, String> ret = seperateLastEntry(path);
+    Directory navigateToDirectory(String path) throws Exception {
+        Pair<Directory, String> ret = separateLastEntry(path);
         Directory dir = ret.getKey().getSubDirectoryByName(ret.getValue());
         if (dir == null) throw new FileNotFoundException(ret.getValue() + " directory does not exit");
         return dir;
     }
 
-    File navigateToFile(String path) throws FileNotFoundException {
-        Pair<Directory, String> ret = seperateLastEntry(path);
+    File navigateToFile(String path) throws Exception {
+        Pair<Directory, String> ret = separateLastEntry(path);
         File file = ret.getKey().getSubFileByName(ret.getValue());
         if (file == null) throw new FileNotFoundException(ret.getValue() + " file does not exit");
         return file;
