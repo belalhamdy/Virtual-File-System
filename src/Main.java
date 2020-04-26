@@ -16,7 +16,14 @@ public class Main {
         DeleteFolder(1),
         DisplayDiskStatus(0),
         DisplayDiskStructure(0),
-        Exit(0);
+        Exit(0),
+
+        CreateUser(2),
+        Grant(3),
+        Login(2),
+        DeleteUser(1),
+        TellUser(0);
+
 
         private int argCnt;
 
@@ -38,7 +45,7 @@ public class Main {
 
         input_loop:
         while (true) {
-            System.out.print("cmd: ");
+            System.out.print("cmd $" + User.getCurrentUser().getName() + ": ");
             String input = in.nextLine();
             String[] ret = input.split(" ");
 
@@ -97,6 +104,34 @@ public class Main {
                     break;
                 case Exit:
                     break input_loop;
+
+                case CreateUser:
+                    try {
+                        User.createUser(ret[1],ret[2]);
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                    break;
+                case Grant:
+                    // TODO : by Dardery
+                    break;
+                case Login:
+                    try {
+                        User.login(ret[1],ret[2]);
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                    break;
+                case DeleteUser:
+                    try {
+                        User.deleteUser(ret[1]);
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                    break;
+                case TellUser:
+                    System.out.println("Current Username is: " +  User.getCurrentUser().getName());
+                    break;
                 default:
                     System.out.println("bad input");
                     break;

@@ -9,6 +9,7 @@ public class User {
     private static User admin = new User(adminName, adminPassword);
     private static User currentUser = admin; // It is said that the default user will be the admin, don't save the admin in user files save only "users" List
     private static List<User> users = new ArrayList<>();
+    private static List<String> deletedUsers = new ArrayList<>();
 
     private String name, password;
 
@@ -26,18 +27,23 @@ public class User {
     }
 
     public static void createUser(String name, String password) throws Exception {
+
         if (name.equals(adminName)) throw new Exception("Cannot create user.. this is the admin's name.");
         if (!currentUser.name.equals(adminName)) throw new Exception("Cannot create user.. Admin only can create.");
-        if (users.stream().anyMatch((user) -> user.name.equals(name))) throw new Exception("Cannot create user.. a user with same name already exists.");
-
-
+        if (users.stream().anyMatch((user) -> user.name.equals(name)))
+            throw new Exception("Cannot create user.. a user with same name already exists.");
+        boolean warning = deletedUsers.stream().anyMatch(curr -> curr.equals(name));
 
         users.add(new User(name, password));
+        if (warning)
+            throw new Exception("Warning.. a user with same name is deleted recently.. The previous grants will be assigned to the new user with new password.");
     }
 
     public static void deleteUser(String name) throws Exception {
         if (!currentUser.name.equals(adminName)) throw new Exception("This command can be done by Admin only");
-        if(!users.removeIf(user -> user.name.equals(name))) throw new Exception("Cannot delete user.. user doesn't exist.");
+        if (!users.removeIf(user -> user.name.equals(name)))
+            throw new Exception("Cannot delete user.. user doesn't exist.");
+        deletedUsers.add(name);
     }
 
     public static void login(String name, String password) throws Exception {
@@ -57,10 +63,10 @@ public class User {
     public String getName() {
         return name;
     }
-    public String getPassword(){
+
+    public String getPassword() {
         return password;
     }
-
 
 
 }
