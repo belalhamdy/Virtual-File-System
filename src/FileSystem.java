@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -6,23 +8,26 @@ public class FileSystem {
     private FileSystem() {
 
     }
-    public static boolean NameIsNotValid(String name, boolean isDirectory){
-        final char[] notValid = {'[' , ']','#','/','\\'};
-        if (name == null || name.length() == 0) {
+
+    public static boolean hasInvalidCharacters(String str) {
+        if (str == null || str.length() == 0) {
             return false;
         }
-        for (int i = 0; i < name.length(); i++) {
-            char ch = name.charAt(i);
-            for (char c : notValid) {
-                if (c == ch) {
-                    return true;
-                }
-            }
-        }
-        if(isDirectory) return name.contains(".");
+        final char[] notValid = {'[', ']', '#', '/', '\\'};
+        for (char s : notValid)
+            if (str.indexOf(s) != -1) return true;
+
+        return false;
+    }
+
+    public static boolean NameIsNotValid(String name, boolean isDirectory) {
+        if (hasInvalidCharacters(name)) return true;
+
+        if (isDirectory) return name.contains(".");
         return false;
 
     }
+
     public static void createFile(Directory parent, String name, long size, IDisk disk) throws Exception {
         File f = new File(name, size, disk.allocate(size), parent);
         parent.add(f);
@@ -47,12 +52,12 @@ public class FileSystem {
         dir.delete();
     }
 
-    private static void recurse(BufferedWriter bw, Directory f) throws IOException {
+    private static void recurseSaveVFS(BufferedWriter bw, Directory f) throws IOException {
         bw.write("[" + f.getName() + "]");
         bw.newLine();
 
         for (int i = 0; i < f.getSubDirectoriesCount(); ++i) {
-            recurse(bw, f.getSubDirectoryByIndex(i));
+            recurseSaveVFS(bw, f.getSubDirectoryByIndex(i));
         }
         for (int i = 0; i < f.getSubFilesCount(); ++i) {
             File file = f.getSubFileByIndex(i);
@@ -64,24 +69,49 @@ public class FileSystem {
         bw.newLine();
     }
 
+    private static void recurseSaveCapabilities(BufferedWriter bw, Directory f, String pathThusFar) throws IOException {
+        String myPath = pathThusFar + f.getName();
+        if (!f.permissions.isEmpty()) {
+            bw.write(myPath);
+            for (Permission v : f.permissions) {
+                bw.write("#");
+                bw.write(v.toString());
+            }
+            bw.newLine();
+        }
+
+        for (int i = 0; i < f.getSubDirectoriesCount(); ++i) {
+            recurseSaveCapabilities(bw, f.getSubDirectoryByIndex(i), myPath);
+        }
+    }
+
     public static void saveVFS(String filePath, Directory root) throws IOException {
         FileOutputStream fstream = new FileOutputStream(filePath);
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fstream));
-        recurse(bw, root);
+        recurseSaveVFS(bw, root);
         bw.flush();
 
         fstream.close();
 
     }
-     public static void saveAdditionalData(String filePath, IDisk disk) throws Exception {
+
+    public static void saveCapabilities(String filePath, Directory root) throws IOException {
+        FileOutputStream fstream = new FileOutputStream(filePath);
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fstream));
+        recurseSaveCapabilities(bw, root, "");
+        bw.flush();
+
+        fstream.close();
+    }
+
+    public static void saveAdditionalData(String filePath, IDisk disk) throws Exception {
         FileOutputStream fstream = new FileOutputStream(filePath);
         StringBuilder out = new StringBuilder("Free Blocks: " + disk.getEmptyBlocks() + "\nAllocated Blocks: " + disk.getAllocatedBlocks() + "\nAllocated Blocks: ");
-         for (boolean item : disk.getDiskSpace())
-         {
-             if (item) out.append('1');
-             else out.append('0');
-         }
-         fstream.write(out.toString().getBytes());
+        for (boolean item : disk.getDiskSpace()) {
+            if (item) out.append('1');
+            else out.append('0');
+        }
+        fstream.write(out.toString().getBytes());
 
         fstream.close();
 
@@ -122,6 +152,55 @@ public class FileSystem {
                     FileSystem.createFile(currentDir, name, size, dsk.fromString(allocationStr, dsk.getBlockSize()));
                 }
             }
+        }
+
+        fstream.close();
+    }
+
+    public static void loadCapabilities(String filePath, Navigator nv) throws Exception {
+        FileInputStream fstream = new FileInputStream(filePath);
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+
+        Pattern pat = Pattern.compile("([^#]*)#(.*)");
+
+        String strLine;
+
+        while ((strLine = br.readLine()) != null) {
+            Matcher mat = pat.matcher(strLine);
+            if (mat.matches()) {
+                String path = mat.group(1);
+                String permissions = mat.group(2);
+                Directory d = nv.navigateToDirectory(path);
+
+                for (String curr : permissions.split("#"))
+                    d.grant(Permission.fromString(curr));
+
+            }
+        }
+
+        fstream.close();
+    }
+
+    public static void saveUsers(String filePath) throws IOException{
+        FileOutputStream fstream = new FileOutputStream(filePath);
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fstream));
+        bw.write(User.getAdmin().toString());
+        for(User v : User.getUsers()){
+            bw.write(v.toString());
+            bw.newLine();
+        }
+        bw.flush();
+        fstream.close();
+    }
+
+    public static void loadUsers(String filePath) throws IOException{
+        FileInputStream fstream = new FileInputStream(filePath);
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+
+        String strLine;
+        User.getUsers().clear();
+        while ((strLine = br.readLine()) != null) {
+            User.getUsers().add(User.fromString(strLine));
         }
 
         fstream.close();

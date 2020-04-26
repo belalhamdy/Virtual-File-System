@@ -17,4 +17,13 @@ public class Permission {
     public boolean canDelete() {
         return this.type.charAt(1) == '1';
     }
+
+    @Override
+    public String toString(){
+        return username + "," + type;
+    }
+    public static Permission fromString(String str) throws Exception {
+        String[] res = str.split(",");
+        return new Permission(res[0],res[1]);
+    }
 }

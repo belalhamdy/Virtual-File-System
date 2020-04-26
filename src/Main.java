@@ -6,8 +6,10 @@ public class Main {
     static Scanner in = new Scanner(System.in);
     static IDisk disk = new IndexedAllocationDisk("My disk", 1024, 1);
     static Navigator ng = new Navigator();
-    static String structureFileName = "data.vfs";
-    static String additionalDataFileName = "dataInformation.txt";
+    final static String structureFileName = "data.vfs";
+    final static String additionalDataFileName = "dataInformation.txt";
+    final static String usersFileName = "users.txt";
+    final static String capabilitiesFileName = "capabilities.txt";
 
     enum Command {
         CreateFile(2),
@@ -39,6 +41,8 @@ public class Main {
     public static void main(String[] args) {
         try {
             FileSystem.loadVFS(structureFileName, ng.getRoot(), disk);
+            FileSystem.loadUsers(usersFileName);
+            FileSystem.loadCapabilities(capabilitiesFileName, ng);
         } catch (Exception ex) {
             System.out.println("Couldn't locate Virtual File System data, a new VFS will be created.");
         }
@@ -113,7 +117,20 @@ public class Main {
                     }
                     break;
                 case Grant:
-                    // TODO : by Dardery
+                    try{
+                        if (!User.getCurrentUser().isAdmin()){
+                            System.out.println("Only admin can execute this command.");
+                            break;
+                        }
+                        if (!User.userExists(ret[1])){
+                            System.out.println("User " + ret[1] + " doesn't exist.");
+                            break;
+                        }
+                        d = ng.navigateToDirectory(ret[2]);
+                        d.grant(new Permission(ret[1], ret[3]));
+                    }catch(Exception ex){
+                        System.out.println(ex.getMessage());
+                    }
                     break;
                 case Login:
                     try {
@@ -140,6 +157,8 @@ public class Main {
         try {
             FileSystem.saveVFS(structureFileName, ng.getRoot());
             FileSystem.saveAdditionalData(additionalDataFileName, disk);
+            FileSystem.saveUsers(usersFileName);
+            FileSystem.saveCapabilities(capabilitiesFileName,ng.getRoot());
         } catch (Exception e) {
             e.printStackTrace();
         }

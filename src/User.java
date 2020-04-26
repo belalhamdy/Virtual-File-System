@@ -28,9 +28,12 @@ public class User {
 
     public static void createUser(String name, String password) throws Exception {
 
-        if (name.equals(adminName)) throw new Exception("Cannot create user.. this is the admin's name.");
         if (!currentUser.name.equals(adminName)) throw new Exception("Cannot create user.. Admin only can create.");
-        if (users.stream().anyMatch((user) -> user.name.equals(name)))
+        if (name.equals(adminName)) throw new Exception("Cannot create user.. this is the admin's name.");
+
+        if (FileSystem.hasInvalidCharacters(name) || FileSystem.hasInvalidCharacters(password)) throw new Exception("Invalid characters encountered in name or password.");
+
+        if (userExists(name))
             throw new Exception("Cannot create user.. a user with same name already exists.");
         boolean warning = deletedUsers.stream().anyMatch(curr -> curr.equals(name));
 
@@ -41,6 +44,8 @@ public class User {
 
     public static void deleteUser(String name) throws Exception {
         if (!currentUser.name.equals(adminName)) throw new Exception("This command can be done by Admin only");
+        if (name.equals(adminName))  throw new Exception("Admin cannot be deleted");
+
         if (!users.removeIf(user -> user.name.equals(name)))
             throw new Exception("Cannot delete user.. user doesn't exist.");
         deletedUsers.add(name);
@@ -60,6 +65,14 @@ public class User {
         throw new Exception("Invalid username or password");
     }
 
+    public static User getAdmin() {
+        return admin;
+    }
+
+    public static boolean userExists(String name) {
+        return users.stream().anyMatch((user) -> user.name.equals(name));
+    }
+
     public String getName() {
         return name;
     }
@@ -68,5 +81,16 @@ public class User {
         return password;
     }
 
+    @Override
+    public String toString(){
+        return getName() + "#" + getPassword();
+    }
+    public static User fromString(String str){
+        String[] split = str.split("#");
+        return new User(split[0],split[1]);
+    }
 
+    public boolean isAdmin() {
+        return getName().equals(adminName);
+    }
 }
