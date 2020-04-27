@@ -26,7 +26,7 @@ public class Directory {
     boolean grant(Permission permission) throws Exception {
         boolean ret = permissions.removeIf((p) -> p.username.equals(permission.username));
 
-        if (directoryName.equals("root") && permission.canDelete()) throw new Exception("Grant Rejected.. No one can delete root.");
+        if (parent == null && permission.canDelete()) throw new Exception("Grant Rejected.. No one can delete root.");
         permissions.add(permission);
 
         return ret;

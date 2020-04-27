@@ -16,34 +16,45 @@ public class Navigator {
         this.root = new Directory("root");
     }
 
-    Pair<Directory, String> separateLastEntry(String path, GrantType grantType) throws Exception {
+    // In create you need to check parent grant , In delete you need to check dir grant
+    Pair<Directory, String> separateLastEntry(String path) throws Exception {
 
         Path p = Paths.get(path);
         Directory cur = root;
+
         if (!p.getName(0).toString().equals("root")) {
-            checkGrant(cur, grantType); // to remove grant root remove this and line 176 in filesystem
+            //checkGrant(cur, grantType); // to remove grant root remove this and line 176 in filesystem
             return null;
         }
         for (int i = 1; i < p.getNameCount() - 1; i++) {
             cur = cur.getSubDirectoryByName(p.getName(i).toString());
             if (cur == null) throw new FileNotFoundException(p.getName(i).toString() + " directory does not exit.");
         }
-        checkGrant(cur, grantType);
+
         return new Pair<>(cur, p.getFileName().toString());
     }
 
     Directory navigateToDirectory(String path, GrantType grantType) throws Exception {
-        Pair<Directory, String> ret = separateLastEntry(path, grantType);
+        Pair<Directory, String> ret = separateLastEntry(path);
+        if (ret == null) throw new FileNotFoundException(path + " path is not found.");
+
         Directory dir = ret.getKey().getSubDirectoryByName(ret.getValue());
 
         if (dir == null) throw new FileNotFoundException(ret.getValue() + " directory does not exit.");
+
+        if (grantType == GrantType.Create) checkGrant(ret.getKey(), grantType);
+        else if (grantType == GrantType.Delete) checkGrant(dir, grantType);
         return dir;
     }
 
     File navigateToFile(String path, GrantType grantType) throws Exception {
-        Pair<Directory, String> ret = separateLastEntry(path, grantType);
+        Pair<Directory, String> ret = separateLastEntry(path);
         File file = ret.getKey().getSubFileByName(ret.getValue());
         if (file == null) throw new FileNotFoundException(ret.getValue() + " file does not exit.");
+
+        if (grantType == GrantType.Create) checkGrant(ret.getKey(), grantType);
+        else if (grantType == GrantType.Delete) checkGrant(ret.getKey(), grantType);
+
         return file;
     }
 

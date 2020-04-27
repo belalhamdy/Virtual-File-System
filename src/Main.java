@@ -45,7 +45,6 @@ public class Main {
             FileSystem.loadCapabilities(capabilitiesFileName, ng);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
-            ex.printStackTrace();
             System.out.println("Couldn't locate Virtual File System data, missing files will be created.");
         }
 
@@ -67,7 +66,7 @@ public class Main {
                 case CreateFile:
                     int sz = Integer.parseInt(ret[2]);
                     try {
-                        p = ng.separateLastEntry(ret[1], GrantType.Create);
+                        p = ng.separateLastEntry(ret[1]);
                         FileSystem.createFile(p.getKey(), p.getValue(), sz, disk);
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
@@ -76,7 +75,7 @@ public class Main {
                     break;
                 case CreateFolder:
                     try {
-                        p = ng.separateLastEntry(ret[1], GrantType.Create);
+                        p = ng.separateLastEntry(ret[1]);
                         FileSystem.createDirectory(p.getKey(), p.getValue());
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
