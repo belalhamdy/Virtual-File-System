@@ -1,6 +1,4 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,7 +68,10 @@ public class FileSystem {
     }
 
     private static void recurseSaveCapabilities(BufferedWriter bw, Directory f, String pathThusFar) throws IOException {
-        String myPath = pathThusFar + f.getName();
+        String myPath;
+        if (pathThusFar.isEmpty()) myPath = f.getName();
+        else myPath = pathThusFar + "/" + f.getName();
+
         if (!f.permissions.isEmpty()) {
             bw.write(myPath);
             for (Permission v : f.permissions) {
@@ -170,7 +171,7 @@ public class FileSystem {
             if (mat.matches()) {
                 String path = mat.group(1);
                 String permissions = mat.group(2);
-                Directory d = nv.navigateToDirectory(path);
+                Directory d = nv.navigateToDirectory(path,GrantType.AllAccess);
 
                 for (String curr : permissions.split("#"))
                     d.grant(Permission.fromString(curr));
@@ -181,11 +182,11 @@ public class FileSystem {
         fstream.close();
     }
 
-    public static void saveUsers(String filePath) throws IOException{
+    public static void saveUsers(String filePath) throws IOException {
         FileOutputStream fstream = new FileOutputStream(filePath);
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fstream));
-        bw.write(User.getAdmin().toString());
-        for(User v : User.getUsers()){
+        bw.write(User.getAdmin().toString() + "\n");
+        for (User v : User.getUsers()) {
             bw.write(v.toString());
             bw.newLine();
         }
@@ -193,7 +194,7 @@ public class FileSystem {
         fstream.close();
     }
 
-    public static void loadUsers(String filePath) throws IOException{
+    public static void loadUsers(String filePath) throws IOException {
         FileInputStream fstream = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 
@@ -205,4 +206,5 @@ public class FileSystem {
 
         fstream.close();
     }
+
 }

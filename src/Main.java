@@ -65,7 +65,7 @@ public class Main {
                 case CreateFile:
                     int sz = Integer.parseInt(ret[2]);
                     try {
-                        p = ng.separateLastEntry(ret[1]);
+                        p = ng.separateLastEntry(ret[1],GrantType.Create);
                         FileSystem.createFile(p.getKey(), p.getValue(), sz, disk);
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
@@ -74,7 +74,7 @@ public class Main {
                     break;
                 case CreateFolder:
                     try {
-                        p = ng.separateLastEntry(ret[1]);
+                        p = ng.separateLastEntry(ret[1],GrantType.Create);
                         FileSystem.createDirectory(p.getKey(), p.getValue());
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
@@ -83,7 +83,7 @@ public class Main {
 
                 case DeleteFile:
                     try {
-                        f = ng.navigateToFile(ret[1]);
+                        f = ng.navigateToFile(ret[1],GrantType.Delete);
                         FileSystem.deleteFile(f);
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
@@ -91,7 +91,7 @@ public class Main {
                     break;
                 case DeleteFolder:
                     try {
-                        d = ng.navigateToDirectory(ret[1]);
+                        d = ng.navigateToDirectory(ret[1],GrantType.Delete);
                         FileSystem.deleteDirectory(d);
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
@@ -126,7 +126,7 @@ public class Main {
                             System.out.println("User " + ret[1] + " doesn't exist.");
                             break;
                         }
-                        d = ng.navigateToDirectory(ret[2]);
+                        d = ng.navigateToDirectory(ret[2],GrantType.AllAccess);
                         d.grant(new Permission(ret[1], ret[3]));
                     }catch(Exception ex){
                         System.out.println(ex.getMessage());

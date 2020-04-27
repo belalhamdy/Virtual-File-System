@@ -3,6 +3,12 @@ import javafx.util.Pair;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+
+enum GrantType {
+    Create, Delete, AllAccess
+}
+
 public class Navigator {
     final private Directory root;
 
@@ -10,7 +16,7 @@ public class Navigator {
         this.root = new Directory("root");
     }
 
-    Pair<Directory, String> separateLastEntry(String path) throws Exception {
+    Pair<Directory, String> separateLastEntry(String path, GrantType grantType) throws Exception {
 
         Path p = Paths.get(path);
         Directory cur = root;
@@ -19,18 +25,19 @@ public class Navigator {
             cur = cur.getSubDirectoryByName(p.getName(i).toString());
             if (cur == null) throw new FileNotFoundException(p.getName(i).toString() + " directory does not exit");
         }
+        checkGrant(cur,grantType);
         return new Pair<>(cur, p.getFileName().toString());
     }
 
-    Directory navigateToDirectory(String path) throws Exception {
-        Pair<Directory, String> ret = separateLastEntry(path);
+    Directory navigateToDirectory(String path, GrantType grantType) throws Exception {
+        Pair<Directory, String> ret = separateLastEntry(path,grantType);
         Directory dir = ret.getKey().getSubDirectoryByName(ret.getValue());
         if (dir == null) throw new FileNotFoundException(ret.getValue() + " directory does not exit");
         return dir;
     }
 
-    File navigateToFile(String path) throws Exception {
-        Pair<Directory, String> ret = separateLastEntry(path);
+    File navigateToFile(String path, GrantType grantType) throws Exception {
+        Pair<Directory, String> ret = separateLastEntry(path,grantType);
         File file = ret.getKey().getSubFileByName(ret.getValue());
         if (file == null) throw new FileNotFoundException(ret.getValue() + " file does not exit");
         return file;
@@ -65,6 +72,13 @@ public class Navigator {
             --overallCount;
             printTree(out, prefix + (lastChild ? "    " : "│   "), node.getSubFileByIndex(i), overallCount == 0);
         }
+    }
+
+    private void checkGrant(Directory dir, GrantType grantType) throws Exception {
+        if (grantType == GrantType.Create && !dir.canCreate(User.getCurrentUser().getName()))
+            throw new Exception("Invalid Grant.. Current user cannot create in this directory");
+        if (grantType == GrantType.Delete && !dir.canDelete(User.getCurrentUser().getName()))
+            throw new Exception("Invalid Grant.. Current user cannot delete from this directory");
     }
 
     public void printVirtualFileSystem(PrintStream out) {
