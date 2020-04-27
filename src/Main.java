@@ -44,6 +44,8 @@ public class Main {
             FileSystem.loadUsers(usersFileName);
             FileSystem.loadCapabilities(capabilitiesFileName, ng);
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
             System.out.println("Couldn't locate Virtual File System data, missing files will be created.");
         }
 
@@ -65,7 +67,7 @@ public class Main {
                 case CreateFile:
                     int sz = Integer.parseInt(ret[2]);
                     try {
-                        p = ng.separateLastEntry(ret[1],GrantType.Create);
+                        p = ng.separateLastEntry(ret[1], GrantType.Create);
                         FileSystem.createFile(p.getKey(), p.getValue(), sz, disk);
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
@@ -74,7 +76,7 @@ public class Main {
                     break;
                 case CreateFolder:
                     try {
-                        p = ng.separateLastEntry(ret[1],GrantType.Create);
+                        p = ng.separateLastEntry(ret[1], GrantType.Create);
                         FileSystem.createDirectory(p.getKey(), p.getValue());
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
@@ -83,7 +85,7 @@ public class Main {
 
                 case DeleteFile:
                     try {
-                        f = ng.navigateToFile(ret[1],GrantType.Delete);
+                        f = ng.navigateToFile(ret[1], GrantType.Delete);
                         FileSystem.deleteFile(f);
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
@@ -91,7 +93,7 @@ public class Main {
                     break;
                 case DeleteFolder:
                     try {
-                        d = ng.navigateToDirectory(ret[1],GrantType.Delete);
+                        d = ng.navigateToDirectory(ret[1], GrantType.Delete);
                         FileSystem.deleteDirectory(d);
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
@@ -111,30 +113,32 @@ public class Main {
 
                 case CreateUser:
                     try {
-                        User.createUser(ret[1],ret[2]);
+                        User.createUser(ret[1], ret[2]);
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
                     }
                     break;
                 case Grant:
-                    try{
-                        if (!User.getCurrentUser().isAdmin()){
+                    try {
+                        if (!User.getCurrentUser().isAdmin()) {
                             System.out.println("Only admin can execute this command.");
                             break;
                         }
-                        if (!User.userExists(ret[1])){
+                        if (!User.userExists(ret[1])) {
                             System.out.println("User " + ret[1] + " doesn't exist.");
                             break;
                         }
-                        d = ng.navigateToDirectory(ret[2],GrantType.AllAccess);
-                        d.grant(new Permission(ret[1], ret[3]));
-                    }catch(Exception ex){
+                        if (ret[2].equals("root")) d = ng.getRoot();
+                        else d = ng.navigateToDirectory(ret[2], GrantType.AllAccess);
+                        if(d.grant(new Permission(ret[1], ret[3])))
+                            throw new Exception("Previous grant is replaced with new one.");
+                    } catch (Exception ex) {
                         System.out.println(ex.getMessage());
                     }
                     break;
                 case Login:
                     try {
-                        User.login(ret[1],ret[2]);
+                        User.login(ret[1], ret[2]);
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
                     }
@@ -147,7 +151,7 @@ public class Main {
                     }
                     break;
                 case TellUser:
-                    System.out.println("Current Username is: " +  User.getCurrentUser().getName());
+                    System.out.println("Current Username is: " + User.getCurrentUser().getName());
                     break;
                 default:
                     System.out.println("bad input");
@@ -158,7 +162,7 @@ public class Main {
             FileSystem.saveVFS(structureFileName, ng.getRoot());
             FileSystem.saveAdditionalData(additionalDataFileName, disk);
             FileSystem.saveUsers(usersFileName);
-            FileSystem.saveCapabilities(capabilitiesFileName,ng.getRoot());
+            FileSystem.saveCapabilities(capabilitiesFileName, ng.getRoot());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -166,24 +170,24 @@ public class Main {
 
     private static boolean argumentVerification(String[] ret) {
         String cmdString = ret[0];
-        Command cmdVal = Command.valueOf(cmdString);
         try {
-            Command v = Command.valueOf(cmdString);
-            if (ret.length != v.argCnt + 1) {
-                System.out.println(cmdString + " takes 2 parameters.");
+            Command cmdVal = Command.valueOf(cmdString);
+            if (ret.length != cmdVal.argCnt + 1) {
+                if(cmdVal.argCnt == 1) System.out.println(cmdString + " takes only 1 parameter.");
+                else System.out.println(cmdString + " takes " + cmdVal.argCnt + " parameters.");
                 return false;
             }
             if (ret.length == 3 && cmdVal != Command.CreateUser && cmdVal != Command.Login) {
                 try {
                     Integer.parseInt(ret[2]);
                 } catch (Exception ignored) {
-                    System.out.println("third argument must be an integer");
+                    System.out.println("third argument must be an integer.");
                     return false;
                 }
             }
             return true;
         } catch (Exception ignored) {
-            System.out.println("Invalid command");
+            System.out.println("Invalid command.");
             return false;
         }
     }

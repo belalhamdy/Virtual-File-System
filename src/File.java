@@ -5,7 +5,7 @@ public class File {
     long size;
     Directory parent;
     File(String fileName,long size,Allocation allocation,Directory parent) throws Exception {
-        if (FileSystem.NameIsNotValid(fileName,false)) throw new Exception("Invalid File Name");
+        if (FileSystem.NameIsNotValid(fileName,false)) throw new Exception("Invalid File Name.");
 
         this.fileName = fileName;
         this.size = size;

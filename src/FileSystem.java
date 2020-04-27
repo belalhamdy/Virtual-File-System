@@ -168,10 +168,13 @@ public class FileSystem {
 
         while ((strLine = br.readLine()) != null) {
             Matcher mat = pat.matcher(strLine);
+            Directory d;
             if (mat.matches()) {
                 String path = mat.group(1);
                 String permissions = mat.group(2);
-                Directory d = nv.navigateToDirectory(path,GrantType.AllAccess);
+
+                if (path.equals("root")) d = nv.getRoot();
+                else d = nv.navigateToDirectory(path, GrantType.AllAccess);
 
                 for (String curr : permissions.split("#"))
                     d.grant(Permission.fromString(curr));
@@ -185,8 +188,9 @@ public class FileSystem {
     public static void saveUsers(String filePath) throws IOException {
         FileOutputStream fstream = new FileOutputStream(filePath);
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fstream));
-        bw.write(User.getAdmin().toString() + "\n");
+        //bw.write(User.getAdmin().toString() + "\n");
         for (User v : User.getUsers()) {
+            if (v.isAdmin()) continue; // don't save admin if it's in the list
             bw.write(v.toString());
             bw.newLine();
         }

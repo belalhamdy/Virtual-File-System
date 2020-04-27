@@ -7,4 +7,6 @@ file1.txt#100#0-99
 [test2]
 file2.txt#50#100-149
 [#test2]
+[Folder1]
+[#Folder1]
 [#root]

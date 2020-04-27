@@ -20,26 +20,30 @@ public class Navigator {
 
         Path p = Paths.get(path);
         Directory cur = root;
-        if (!p.getName(0).toString().equals("root")) return null;
+        if (!p.getName(0).toString().equals("root")) {
+            checkGrant(cur, grantType); // to remove grant root remove this and line 176 in filesystem
+            return null;
+        }
         for (int i = 1; i < p.getNameCount() - 1; i++) {
             cur = cur.getSubDirectoryByName(p.getName(i).toString());
-            if (cur == null) throw new FileNotFoundException(p.getName(i).toString() + " directory does not exit");
+            if (cur == null) throw new FileNotFoundException(p.getName(i).toString() + " directory does not exit.");
         }
-        checkGrant(cur,grantType);
+        checkGrant(cur, grantType);
         return new Pair<>(cur, p.getFileName().toString());
     }
 
     Directory navigateToDirectory(String path, GrantType grantType) throws Exception {
-        Pair<Directory, String> ret = separateLastEntry(path,grantType);
+        Pair<Directory, String> ret = separateLastEntry(path, grantType);
         Directory dir = ret.getKey().getSubDirectoryByName(ret.getValue());
-        if (dir == null) throw new FileNotFoundException(ret.getValue() + " directory does not exit");
+
+        if (dir == null) throw new FileNotFoundException(ret.getValue() + " directory does not exit.");
         return dir;
     }
 
     File navigateToFile(String path, GrantType grantType) throws Exception {
-        Pair<Directory, String> ret = separateLastEntry(path,grantType);
+        Pair<Directory, String> ret = separateLastEntry(path, grantType);
         File file = ret.getKey().getSubFileByName(ret.getValue());
-        if (file == null) throw new FileNotFoundException(ret.getValue() + " file does not exit");
+        if (file == null) throw new FileNotFoundException(ret.getValue() + " file does not exit.");
         return file;
     }
 
@@ -75,10 +79,13 @@ public class Navigator {
     }
 
     private void checkGrant(Directory dir, GrantType grantType) throws Exception {
-        if (grantType == GrantType.Create && !dir.canCreate(User.getCurrentUser().getName()))
-            throw new Exception("Invalid Grant.. Current user cannot create in this directory");
-        if (grantType == GrantType.Delete && !dir.canDelete(User.getCurrentUser().getName()))
-            throw new Exception("Invalid Grant.. Current user cannot delete from this directory");
+        if (User.getCurrentUser().isAdmin()) return;
+
+        String username = User.getCurrentUser().getName();
+        if (grantType == GrantType.Create && !dir.canCreate(username))
+            throw new Exception("Invalid Grant.. Current user (" + username + ") cannot create in this directory.");
+        if (grantType == GrantType.Delete && !dir.canDelete(username))
+            throw new Exception("Invalid Grant.. Current user (" + username + ") cannot delete from this directory.");
     }
 
     public void printVirtualFileSystem(PrintStream out) {

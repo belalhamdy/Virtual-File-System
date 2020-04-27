@@ -43,8 +43,8 @@ public class User {
     }
 
     public static void deleteUser(String name) throws Exception {
-        if (!currentUser.name.equals(adminName)) throw new Exception("This command can be done by Admin only");
-        if (name.equals(adminName))  throw new Exception("Admin cannot be deleted");
+        if (!currentUser.name.equals(adminName)) throw new Exception("This command can be done by Admin only.");
+        if (name.equals(adminName))  throw new Exception("Admin cannot be deleted.");
 
         if (!users.removeIf(user -> user.name.equals(name)))
             throw new Exception("Cannot delete user.. user doesn't exist.");
@@ -63,7 +63,7 @@ public class User {
                 currentUser = user;
                 return;
             }
-        throw new Exception("Invalid username or password");
+        throw new Exception("Invalid username or password.");
     }
 
     public static User getAdmin() {

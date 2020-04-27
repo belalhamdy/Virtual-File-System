@@ -12,28 +12,43 @@ public class Directory {
 
     Directory(String directoryName) {
         this.directoryName = directoryName;
+        this.parent = null;
     }
 
     Directory(String directoryName, Directory parent) throws Exception {
-        if (FileSystem.NameIsNotValid(directoryName, true)) throw new Exception("Invalid Directory Name");
+        if (FileSystem.NameIsNotValid(directoryName, true)) throw new Exception("Invalid Directory Name.");
 
         this.parent = parent;
         this.directoryName = directoryName;
     }
 
     // return if there any previous permissions
-    boolean grant(Permission permission) {
+    boolean grant(Permission permission) throws Exception {
         boolean ret = permissions.removeIf((p) -> p.username.equals(permission.username));
+
+        if (directoryName.equals("root") && permission.canDelete()) throw new Exception("Grant Rejected.. No one can delete root.");
         permissions.add(permission);
 
         return ret;
     }
-    boolean canCreate(String username){
-        return permissions.stream().anyMatch(permission -> permission.username.equals(username) && permission.canCreate());
+
+    // If you want the permissions not inherited remove lines 36-38, 44-46 all inclusive
+    boolean canCreate(String username) {
+        boolean canCreateHere = permissions.stream().anyMatch(permission -> permission.username.equals(username) && permission.canCreate());
+        if (parent != null)
+            return (canCreateHere | parent.canCreate(username));
+        else
+            return canCreateHere;
     }
-    boolean canDelete(String username){
-        return permissions.stream().anyMatch(permission -> permission.username.equals(username) && permission.canDelete());
+
+    boolean canDelete(String username) {
+        boolean canDeleteHere = permissions.stream().anyMatch(permission -> permission.username.equals(username) && permission.canDelete());
+        if (parent != null)
+            return (canDeleteHere | parent.canDelete(username));
+        else
+            return canDeleteHere;
     }
+
     void add(File file) throws Exception {
         for (File f : subFiles) {
             if (f.fileName.equals(file.fileName))
