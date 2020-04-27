@@ -44,7 +44,7 @@ public class Main {
             FileSystem.loadUsers(usersFileName);
             FileSystem.loadCapabilities(capabilitiesFileName, ng);
         } catch (Exception ex) {
-            System.out.println("Couldn't locate Virtual File System data, a new VFS will be created.");
+            System.out.println("Couldn't locate Virtual File System data, missing files will be created.");
         }
 
         input_loop:
@@ -165,18 +165,19 @@ public class Main {
     }
 
     private static boolean argumentVerification(String[] ret) {
-        String cmd = ret[0];
+        String cmdString = ret[0];
+        Command cmdVal = Command.valueOf(cmdString);
         try {
-            Command v = Command.valueOf(cmd);
+            Command v = Command.valueOf(cmdString);
             if (ret.length != v.argCnt + 1) {
-                System.out.println(cmd + " takes 2 parameters.");
+                System.out.println(cmdString + " takes 2 parameters.");
                 return false;
             }
-            if (ret.length == 3) {
+            if (ret.length == 3 && cmdVal != Command.CreateUser && cmdVal != Command.Login) {
                 try {
                     Integer.parseInt(ret[2]);
                 } catch (Exception ignored) {
-                    System.out.println("size is not integer");
+                    System.out.println("third argument must be an integer");
                     return false;
                 }
             }

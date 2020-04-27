@@ -53,6 +53,7 @@ public class User {
 
     public static void login(String name, String password) throws Exception {
         String currName = name.toLowerCase();
+        if (currName.equals(getCurrentUser().getName())) throw new Exception("This user already logged in.");
         if (currName.equals(adminName) && password.equals(adminPassword)) {
             currentUser = admin;
             return;
