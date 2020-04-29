@@ -17,7 +17,7 @@ public class Navigator {
     }
 
     // In create you need to check parent grant , In delete you need to check dir grant
-    Pair<Directory, String> separateLastEntry(String path) throws Exception {
+    Pair<Directory, String> separateLastEntry(String path,GrantType grantType) throws Exception {
 
         Path p = Paths.get(path);
         Directory cur = root;
@@ -30,30 +30,29 @@ public class Navigator {
             cur = cur.getSubDirectoryByName(p.getName(i).toString());
             if (cur == null) throw new FileNotFoundException(p.getName(i).toString() + " directory does not exit.");
         }
-
+        if (grantType == GrantType.Create) checkGrant(cur, grantType);
         return new Pair<>(cur, p.getFileName().toString());
     }
 
     Directory navigateToDirectory(String path, GrantType grantType) throws Exception {
-        Pair<Directory, String> ret = separateLastEntry(path);
+        Pair<Directory, String> ret = separateLastEntry(path,grantType);
         if (ret == null) throw new FileNotFoundException(path + " path is not found.");
 
         Directory dir = ret.getKey().getSubDirectoryByName(ret.getValue());
 
         if (dir == null) throw new FileNotFoundException(ret.getValue() + " directory does not exit.");
 
-        if (grantType == GrantType.Create) checkGrant(ret.getKey(), grantType);
-        else if (grantType == GrantType.Delete) checkGrant(dir, grantType);
+        if (grantType == GrantType.Delete) checkGrant(dir, grantType);
         return dir;
     }
 
     File navigateToFile(String path, GrantType grantType) throws Exception {
-        Pair<Directory, String> ret = separateLastEntry(path);
+        Pair<Directory, String> ret = separateLastEntry(path,grantType);
         File file = ret.getKey().getSubFileByName(ret.getValue());
         if (file == null) throw new FileNotFoundException(ret.getValue() + " file does not exit.");
 
-        if (grantType == GrantType.Create) checkGrant(ret.getKey(), grantType);
-        else if (grantType == GrantType.Delete) checkGrant(ret.getKey(), grantType);
+
+        if (grantType == GrantType.Delete) checkGrant(ret.getKey(), grantType);
 
         return file;
     }

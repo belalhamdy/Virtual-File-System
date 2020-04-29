@@ -66,7 +66,7 @@ public class Main {
                 case CreateFile:
                     int sz = Integer.parseInt(ret[2]);
                     try {
-                        p = ng.separateLastEntry(ret[1]);
+                        p = ng.separateLastEntry(ret[1],GrantType.Create);
                         FileSystem.createFile(p.getKey(), p.getValue(), sz, disk);
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
@@ -75,7 +75,8 @@ public class Main {
                     break;
                 case CreateFolder:
                     try {
-                        p = ng.separateLastEntry(ret[1]);
+                        p = ng.separateLastEntry(ret[1],GrantType.Create);
+                        if (p == null) throw new Exception("Invalid Path");
                         FileSystem.createDirectory(p.getKey(), p.getValue());
                     } catch (Exception ex) {
                         System.out.println(ex.getMessage());
